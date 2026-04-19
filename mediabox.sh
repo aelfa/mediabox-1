@@ -8,8 +8,8 @@ fi
 
 # See if we need to check GIT for updates
 if [ -e .env ]; then
-    # Check for Updated Docker-Compose
-    printf "Checking for update to Docker-Compose (If needed - You will be prompted for SUDO credentials).\\n\\n"
+    # Check for Updated docker-compose
+    printf "Checking for update to docker-compose (If needed - You will be prompted for SUDO credentials).\\n\\n"
     onlinever=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep "tag_name" | cut -d ":" -f2 | sed 's/"//g' | sed 's/,//g' | sed 's/ //g')
     printf "Current online version is: %s \\n" "$onlinever"
     localver=$(docker-compose -v | cut -d " " -f4 | sed 's/,//g')
@@ -19,7 +19,7 @@ if [ -e .env ]; then
         sudo chmod +x /usr/local/bin/docker-compose
         printf "\\n\\n"
     else
-        printf "No Docker-Compose Update needed.\\n\\n"
+        printf "No docker-compose Update needed.\\n\\n"
     fi
     # Check for updates to the Mediabox repo
     printf "Updating your local copy of Mediabox.\\n\\n"
@@ -71,7 +71,7 @@ if [ -e 1.env ]; then
     mv 1.env .env
     # Stop the current Mediabox stack
     printf "\\n\\nStopping Current Mediabox containers.\\n\\n"
-    docker-compose stop
+    docker compose stop
     # Make a datestampted copy of the existing .env file
     mv .env "$(date +"%Y-%m-%d_%H:%M").env"
 fi
@@ -175,6 +175,7 @@ mkdir -p homer
 mkdir -p jackett
 mkdir -p jellyfin
 mkdir -p lidarr
+mkdir -p maintainerr
 mkdir -p metube
 mkdir -p minio
 mkdir -p nzbget
@@ -235,9 +236,9 @@ cat << EOF > .env
 ###  M E D I A B O X   C O N F I G   S E T T I N G S
 ###  ------------------------------------------------
 ###  The values configured here are applied during
-###  $ docker-compose up
+###  $ docker compose up
 ###  -----------------------------------------------
-###  DOCKER-COMPOSE ENVIRONMENT VARIABLES BEGIN HERE
+###  docker compose ENVIRONMENT VARIABLES BEGIN HERE
 ###  -----------------------------------------------
 ###
 EOF
@@ -290,7 +291,7 @@ echo "The containers will now be pulled and launched"
 echo "This may take a while depending on your download speed"
 read -r -p "Press any key to continue... " -n1 -s
 printf "\\n\\n"
-docker-compose up -d --remove-orphans
+docker compose up -d --remove-orphans
 printf "\\n\\n"
 
 # Configure the access to the Deluge Daemon

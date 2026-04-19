@@ -18,6 +18,7 @@ Components include:
 * [Jackett Tracker API and Proxy](https://github.com/Jackett/Jackett)
 * [Jellyfin Free Software Media System](https://github.com/jellyfin/jellyfin)
 * [Lidarr Music collection manager](https://lidarr.audio/)
+* [Maintainerr library management system](https://maintainerr.info/)
 * [MeTube Web GUI for youtube-dl](https://github.com/alexta69/metube)
 * [Minio cloud storage](https://www.minio.io/)
 * [NetData System Monitoring](https://github.com/netdata/netdata)
@@ -42,7 +43,7 @@ Components include:
 
 ## Prerequisites
 
-* [Ubuntu 18.04 LTS](https://www.ubuntu.com/) Or [Ubuntu 20.04 LTS](https://www.ubuntu.com/)
+* [Ubuntu 24.04 LTS](https://www.ubuntu.com/)
 * [VPN account from Private internet Access](https://www.privateinternetaccess.com/) (Please see [binhex's Github Repo](https://github.com/binhex/arch-delugevpn) if you want to use a different VPN)
 * [Git](https://git-scm.com/)
 * [Docker](https://www.docker.com/)
@@ -56,59 +57,82 @@ For simplicity's sake (eg. automatic dependency management), the method used to 
 
 (You'll need superuser access to run these commands successfully)
 
-Start by updating and upgrading our current packages:
+## Installation (Ubuntu 24.04.3 LTS)
 
-`$ sudo apt update && sudo apt full-upgrade`
+### 1) Update and upgrade packages
+```bash
+sudo apt update && sudo apt full-upgrade
+```
 
-Install the prerequisite packages:
+### 2) Install prerequisites
+```bash
+sudo apt install -y curl git bridge-utils whiptail
+```
 
-`$ sudo apt install curl git bridge-utils`
+### 3) Remove old Docker (OK if nothing to remove)
+```bash
+sudo apt remove -y docker docker-engine docker.io containerd runc
+sudo snap remove docker
+```
 
-**Note** - Mediabox uses Docker CE as the default Docker version - if you skip this and run with older/other Docker versions you may have issues.
+### 4) Install Docker CE (official method)
+```bash
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-1. Uninstall old versions - It’s OK if apt and/or snap report that none of these packages are installed.  
-    `$ sudo apt remove docker docker-engine docker.io containerd runc`  
-    `$ sudo snap remove docker`  
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" \
+| sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-2. Install Docker CE:  
-    `$ curl -fsSL https://get.docker.com -o get-docker.sh`  
-    `$ sudo sh get-docker.sh`  
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
 
-3. Install Docker-Compose:  
+Verify:
+```bash
+docker --version
+docker compose version
+```
 
-    ```bash
-    sudo curl -s https://api.github.com/repos/docker/compose/releases/latest | grep "browser_download_url" | grep -i -m1 `uname -s`-`uname -m` | cut -d '"' -f4 | xargs sudo curl -L -o /usr/local/bin/docker-compose
-    ```
+### 5) Add your user to the docker group
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
 
-4. Set the permissions: `$ sudo chmod +x /usr/local/bin/docker-compose`  
+### 6) DelugeVPN kernel module
+```bash
+sudo /sbin/modprobe iptable_mangle
+echo iptable_mangle | sudo tee -a /etc/modules
+```
 
-5. Verify the Docker Compose installation: `$ docker-compose -v`  
-
-Add the current user to the docker group:
-
-`$ sudo usermod -aG docker $USER`
-
-Adjustments for the the DelugeVPN container
-
-`$ sudo /sbin/modprobe iptable_mangle`
-
-`$ sudo bash -c "echo iptable_mangle >> /etc/modules"`
-
-Reboot your machine manually, or using the command line:
-
-`$ sudo reboot`
-
+### 7) Reboot (recommended if Docker group just added)
+```bash
+sudo reboot
+```
 ## Using mediabox
 
 Once the prerequisites are all taken care of you can move forward with using mediabox.
 
-1. Clone the mediabox repository: `$ git clone https://github.com/tom472/mediabox.git`
+### 8) Clone Mediabox
+```bash
+git clone https://github.com/jamesvthompson/mediabox.git
+cd mediabox
+```
 
-2. Change directory into mediabox: `$ cd mediabox/`
+### 9) Configure & Deploy
+```bash
+# Run the Mediabox setup script (collects .env and prepares compose)
+./mediabox.sh
+```
 
-3. Run the mediabox.sh script: `$ ./mediabox.sh`  (**See below for the script questions**)
-
-4. To upgrade Mediabox at anytime, re-run the mediabox script: `$ ./mediabox.sh`
+### Notes
+- **Plex tag:** set `PMSTAG` in `.env` (e.g., `public` or `plexpass`). Example image:
+  `image: plexinc/pms-docker:${PMSTAG:-public}`
+- If you change image tags, test them directly first:
+  
+## Using mediabox
 
 ### Please be prepared to supply the following details after you run Step 3 above
 

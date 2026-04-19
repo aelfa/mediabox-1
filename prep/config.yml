@@ -144,6 +144,12 @@ services:
         tagstyle: "is-info"
         url: "http://locip:8686"
         target: "_blank"
+      - name: "Maintainerr"
+        logo: "assets/icons/maintainerr.png"
+        tag: "manage"
+        tagstyle: "is -info"
+        url: "http://locip:6246"
+        target: "_blank"
       - name: "Minio"
         logo: "assets/icons/minio.png"
         tag: "manage"
@@ -251,4 +257,7 @@ services:
         tag: "watch"
         tagstyle: "is-success"
         url: "http://locip:32400/web"
+
         target: "_blank"
+
+
