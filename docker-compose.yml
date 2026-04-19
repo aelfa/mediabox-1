@@ -390,22 +390,21 @@ services:
         - '/etc/localtime:/etc/localtime:ro'
 
   # ----------------------------------------
-  # OVERSEERR
+  # SEERR
   # ----------------------------------------
-  overseerr:
-    image: lscr.io/linuxserver/overseerr
-    container_name: overseerr
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
     restart: unless-stopped
     network_mode: "bridge"
     environment:
-        - PUID=${PUID}
-        - PGID=${PGID}
         - LOG_LEVEL=info
         - TZ=${TZ}
     ports:
         - ${IP_ADDRESS}:5055:5055
     volumes:
-        - ./overseerr:/config
+        - './seerr:/app/config'
 
   # ----------------------------------------
   # PLEX

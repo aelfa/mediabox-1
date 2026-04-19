@@ -181,7 +181,11 @@ mkdir -p minio
 mkdir -p nzbget
 mkdir -p nzbhydra2
 mkdir -p ombi
-mkdir -p overseerr
+# Migrate legacy Overseerr config directory to Seerr on first run.
+if [ -d "overseerr" ] && [ ! -d "seerr" ]; then
+    mv overseerr seerr
+fi
+mkdir -p seerr
 mkdir -p "plex/Library/Application Support/Plex Media Server/Logs"
 mkdir -p portainer
 mkdir -p prowlarr
